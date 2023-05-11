@@ -59,3 +59,36 @@ laurea (286)
         WHERE `phone` IS NULL;
 
 
+Concateno due tabelle (students, courses)
+
+        SELECT students.id,  students.name, students.surname, courses.period, courses.year
+        FROM students
+        INNER JOIN courses
+        ON students.id  =  courses.id;
+
+
+Concateno due tabelle e filtro in base all'età, anno corso e periodo corso
+
+        SELECT students.id,  students.name, students.surname, students.date_of_birth, courses.period, courses.year 
+        FROM students
+        LEFT JOIN courses
+        ON students.id = courses.id
+        WHERE DATEDIFF(CURDATE(), `date_of_birth`)/365 < 30
+        AND courses.year = 1
+        AND courses.period = 'II semestre';
+
+
+Concateno tre tabelle e filtro in base all'età, anno corso, periodo corso, voto esami
+
+        SELECT DISTINCT students.id,  students.name, students.surname, students.date_of_birth, courses.period, courses.year, exam_student.vote
+        FROM students
+        INNER JOIN courses ON students.id = courses.id
+        INNER JOIN exam_student ON courses.id = exam_student.student_id
+        WHERE DATEDIFF(CURDATE(), `date_of_birth`)/365 < 30
+        AND courses.year = 2
+        AND courses.period = 'I semestre'
+        AND exam_student.vote > 18;
+ 
+ 
+
+
