@@ -64,6 +64,12 @@ superare ciascuno dei suoi esami
 
 -----------NON COMPLETO--------
 
-SELECT students.name, students.surname, exam_student.exam_id
-FROM students
+SELECT students.name, students.surname, exam_student.vote, exam_student.exam_id, degrees.name
+FROM degrees
+JOIN students ON degrees.id = students.degree_id
 JOIN exam_student ON students.id = exam_student.student_id
+JOIN exams ON exam_student.exam_id = exams.id
+JOIN courses ON exams.course_id = courses.id
+WHERE exam_student.vote > 18
+ORDER BY students.name, students.surname
+
