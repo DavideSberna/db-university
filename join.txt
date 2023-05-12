@@ -62,14 +62,39 @@ WHERE departments.name = 'Dipartimento di Matematica'
 7. BONUS: Selezionare per ogni studente quanti tentativi d’esame ha sostenuto per
 superare ciascuno dei suoi esami
 
------------NON COMPLETO--------
+-----------CORRETTO--------
 
-SELECT students.name, students.surname, exam_student.vote, exam_student.exam_id, degrees.name
+SELECT COUNT(students.id) AS number_attemp, students.name, students.surname, degrees.name AS name_course
 FROM degrees
 JOIN students ON degrees.id = students.degree_id
 JOIN exam_student ON students.id = exam_student.student_id
 JOIN exams ON exam_student.exam_id = exams.id
 JOIN courses ON exams.course_id = courses.id
-WHERE exam_student.vote > 18
-ORDER BY students.name, students.surname
+WHERE exam_student.vote < 18
+GROUP BY students.name, students.surname, degrees.name
 
+-----------NON COMPLETO--------
+
+        SELECT COUNT(*) students.name, students.surname, degrees.name
+        FROM degrees
+        JOIN students ON degrees.id = students.degree_id
+        JOIN exam_student ON students.id = exam_student.student_id
+        JOIN exams ON exam_student.exam_id = exams.id
+        JOIN courses ON exams.course_id = courses.id
+        WHERE exam_student.vote > 18
+        GROUP BY students.name, students.surname, degrees.name
+
+
+         
+
+
+
+        SELECT students.name, students.surname, exam_student.vote, exam_student.exam_id, degrees.name
+        FROM degrees
+        JOIN students ON degrees.id = students.degree_id
+        JOIN exam_student ON students.id = exam_student.student_id
+        JOIN exams ON exam_student.exam_id = exams.id
+        JOIN courses ON exams.course_id = courses.id
+        WHERE students.name = 'Aaron'
+        AND students.surname = 'Lombardo'
+        AND exam_student.vote < 18
