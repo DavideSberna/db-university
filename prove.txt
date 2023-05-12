@@ -1,0 +1,164 @@
+Concateno due tabelle (students, courses)
+
+        SELECT students.id,  students.name, students.surname, courses.period, courses.year
+        FROM students
+        INNER JOIN courses
+        ON students.id  =  courses.id;
+
+
+Concateno due tabelle e filtro in base all'età, anno corso e periodo corso
+
+        SELECT students.id,  students.name, students.surname, students.date_of_birth, courses.period, courses.year 
+        FROM students
+        LEFT JOIN courses
+        ON students.id = courses.id
+        WHERE DATEDIFF(CURDATE(), `date_of_birth`)/365 < 30
+        AND courses.year = 1
+        AND courses.period = 'II semestre';
+
+
+Concateno tre tabelle e filtro in base all'età, anno corso, periodo corso, voto esami
+
+        SELECT DISTINCT students.id,  students.name, students.surname, students.    date_of_birth, courses.period, courses.year, exam_student.vote
+        FROM students
+        INNER JOIN courses ON students.id = courses.id
+        INNER JOIN exam_student ON courses.id = exam_student.student_id
+        WHERE DATEDIFF(CURDATE(), `date_of_birth`)/365 < 30
+        AND courses.year = 2
+        AND courses.period = 'I semestre'
+        AND exam_student.vote > 18;
+
+
+
+FILTRARE IN UNA TABELLA IL NUERO TOTALE DI RECORD DELLO STESSO CFU, IN PIU DEVE ESSERE MAGGIORE DI ZERO
+
+SELECT COUNT(*) AS `numero_corsi`, `cfu`
+FROM `courses`
+GROUP BY `cfu`
+HAVING `numero_corsi` > 100
+ 
+
+
+FILTRA TUTTI GLI STUDENTI CHE HANNO LO STESSO ANNO, TROVA QUANTI STUDENTI SONO NATI LO STESSO ANNO PER OGNI ANNO 
+
+SELECT COUNT(*) AS `numero_studenti`, YEAR(`date_of_birth`) AS `anno`
+FROM `students`
+GROUP BY `anno`;
+ 
+
+
+ FILTRARE IL VOTO PIU BASSO PER OGNI STUDENTE CON MIN
+
+ SELECT MIN(`vote`) AS `voto_peggiore`
+FROM `exam_student`
+GROUP BY `exam_id`
+
+
+
+FILTRARE TUTTI GLI ESAMI CHE SONO STATI DATI NEL MESE DI LUGLIO
+
+SELECT COUNT(*) AS `appelli`, DAY(`date`) AS `giorno_esame`
+FROM exams
+WHERE MONTH(`date`) = 7
+GROUP BY DAY(`date`)
+
+                Nella tabella ho inserito anche il mese(sarà luglio)
+
+                SELECT COUNT(*) AS `appelli`, DAY(`date`) AS `giorno_esame`, MONTH(`date`)
+                FROM exams
+                WHERE MONTH(`date`) = 7
+                GROUP BY DAY(`date`)
+
+
+
+
+
+FILTRARE TRA DUE TABELLE COURSES E DEGREES
+
+SELECT `courses`.`id`, `courses`.`name`, `courses`.`period`, `courses`.`year`, `courses`.`cfu`, `courses`.`website`, `degrees`.`name`
+FROM  `courses`
+INNER JOIN  `degrees`
+ON `degrees`.`id` = `courses`.`degree_id`
+WHERE `degrees`.`name` = 'Corso di Laurea in Informatica'
+
+
+
+
+FILTRARE TRA TRE TABELLE CHE HANNO LA SELAZIONE E PONTE 
+
+SELECT `courses`.`name`, `courses`.`period`, `courses`.`year`, `courses`.`cfu`, `courses`.`website`
+FROM `degrees`
+JOIN `courses`
+ON `degrees`.`id` = `courses`.`degree_id`
+JOIN `exams`
+ON `courses`.`id` = `exams`.`course_id`
+
+                            alternativa 
+
+SELECT `courses`.`name`, `courses`.`period`, `courses`.`year`, `courses`.`cfu`, `courses`.`website`, `exams`.`date`, `exams`.`hour`, `exams`.`location`
+FROM `degrees`
+JOIN `courses`
+ON `degrees`.`id` = `courses`.`degree_id`
+JOIN `exams`
+ON `courses`.`id` = `exams`.`course_id`
+WHERE `degrees`.`name` = 'Corso di Laurea in Biologia molecolare'
+
+
+
+
+
+Selezionare le informazioni sul corso con id = 144, con tutti i relativi appelli d’esame
+
+SELECT *
+FROM courses
+JOIN exams ON courses.id = exams.course_id
+WHERE courses.id = 144;
+
+
+
+Selezionare a quale dipartimento appartiene il Corso di Laurea in Diritto
+dell'Economia (Dipartimento di Scienze politiche, giuridiche e studi internazionali)
+
+SELECT *
+FROM departments
+JOIN degrees ON departments.id = degrees.department_id
+WHERE degrees.name = 'Corso di Laurea in Diritto dell\'Economia';
+
+
+
+Selezionare tutti i docenti che insegnano nel Corso di Laurea in Lettere (21)
+
+SELECT *
+FROM degrees
+JOIN courses ON degrees.id = courses.degree_id
+JOIN course_teacher ON courses.id = course_teacher.course_id
+JOIN teachers ON teachers.id = course_teacher.teacher_id
+WHERE degrees.name = 'Corso di Laurea in Lettere'
+
+
+
+Selezionare il libretto universitario di Mirco Messina (matricola n. 620320)
+
+-------------SBAGLIATA-----------------------
+
+SELECT *
+FROM courses
+JOIN exams ON courses.id = exams.course_id
+JOIN exam_student ON exams.id = exam_student.exam_id
+JOIN students ON exam_student.id = students.id
+WHERE students.registration_number = 620320
+AND exam_student.vote >= 18;
+
+
+
+Selezionare il voto medio di superamento d'esame per ogni corso, con anche i dati
+del corso di laurea associato, ordinati per media voto decrescente
+
+SELECT `degrees`.`name` AS `name_degree`, AVG(`exam_student`.`vote`) AS `average_vote`
+FROM `degrees`
+JOIN `courses` ON `degrees`.`id` = `courses`.`degree_id`
+JOIN `exams` ON `exams`.`course_id` = `courses`.`id`
+JOIN `exam_student` ON `exam_student`.`exam_id` = `exams`.`id`
+WHERE `exam_student`.`vote` >= 18
+GROUP BY `courses`.`id`
+ORDER BY `average_vote` DESC;
